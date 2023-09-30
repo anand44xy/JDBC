@@ -1,0 +1,24 @@
+package com.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class Firstjdbc {
+	public static void main(String[] args) {
+		try {
+			// load Driver
+			Class.forName("com.mysql.jdbc.Driver");
+
+			// Creating a connection
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/student", "Anand", "8550");
+
+			if (con.isClosed()) {
+				System.out.println("Connection Failed!...");
+			} else {
+				System.out.println("Connection Successfully.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

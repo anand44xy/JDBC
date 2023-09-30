@@ -1,0 +1,66 @@
+package com.jdbc;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+public class LargeImagesToDB {
+
+	public static void main(String[] args) {
+		try {
+			// Load Driver
+			Class.forName("com.mysql.cj.jdbc.Driver");
+
+			// Create connection
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/employee", "Anand", "8550");
+
+			// Create dynamic query
+			String q = "INSERT INTO eimages(ePic) VALUES(?)";
+			PreparedStatement pstmt = con.prepareStatement(q);
+
+			// Create a file chooser
+			JFileChooser jfc = new JFileChooser();
+
+			// Show the file chooser dialog and wait for user selection
+			int result = jfc.showOpenDialog(null);
+
+			if (result == JFileChooser.APPROVE_OPTION) {
+				// Get the selected file
+				File file = jfc.getSelectedFile();
+
+				// Check if the selected file exists
+				if (file.exists() && file.isFile()) {
+					// Get selected file and store them
+					FileInputStream fis = new FileInputStream(file);
+
+					// Insert the image into the database table as binary data
+					pstmt.setBinaryStream(1, fis, fis.available());
+
+					// Returns the number of rows inserted, updated, or deleted.
+					int rowsAffected = pstmt.executeUpdate();
+
+					if (rowsAffected > 0) {
+						JOptionPane.showMessageDialog(null, "Image stored successfully.");
+					} else {
+						JOptionPane.showMessageDialog(null, "Image insertion failed!");
+					}
+
+					fis.close(); // Close the input stream
+				} else {
+					JOptionPane.showMessageDialog(null, "Invalid file selected.");
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "No file selected.");
+			}
+
+			con.close(); // Close the database connection
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
